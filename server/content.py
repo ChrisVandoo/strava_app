@@ -6,8 +6,10 @@ import requests
 
 from server.auth import login_required
 from server.db import get_db
+from server.strava import parse_auth_url, request_access_token
 
 bp = Blueprint('content', __name__)
+
 
 @bp.route('/')
 def index():
@@ -27,5 +29,9 @@ def get_strava_data():
 
 @bp.route('/strava/auth')
 def strava_token_exchange():
-    print(request)
+    # at this point i need to parse the auth code and scope
+    # check that the scope is what i need (if not redirect)
+    # exchange auth code for access token
+    code, scope = parse_auth_url(request.url) 
+    request_access_token(code, client_id, client_secret)
     return render_template('index.html')

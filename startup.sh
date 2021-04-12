@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/usr/bin/env zsh
+
 echo "setting up some dev environment variables..."
 
 export FLASK_APP=server
