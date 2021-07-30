@@ -33,5 +33,5 @@ def strava_token_exchange():
     # check that the scope is what i need (if not redirect)
     # exchange auth code for access token
     code, scope = parse_auth_url(request.url) 
-    request_access_token(code, client_id, client_secret)
+    request_access_token(code, 60014, client_secret)
     return render_template('index.html')
