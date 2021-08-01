@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS post;
+DROP TABLE IF EXISTS auth;
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -15,3 +16,10 @@ CREATE TABLE post (
   body TEXT NOT NULL,
   FOREIGN KEY (author_id) REFERENCES user (id)
 );
+
+CREATE TABLE auth (
+  id INTEGER PRIMARY KEY,
+  expires_at INTEGER NOT NULL,
+  refresh_token TEXT NOT NULL,
+  access_token TEXT NOT NULL
+)
