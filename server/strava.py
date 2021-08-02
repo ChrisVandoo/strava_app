@@ -2,17 +2,14 @@ from urllib.parse import urlparse, parse_qs
 from requests import post
 from time import time
 
-def get_client_secret():
-    return ""
-
+from server.db import get_db 
 
 class Auth:
     # wrapper for authentication with Strava
     _client_id=60014
 
-    def __init__(self, db, user, client_secret):
-        self._client_secret = client_secret
-        self._db = db 
+    def __init__(self, user):
+        self._db = get_db() 
         self._user = user
 
         self._access_token=""
@@ -22,6 +19,8 @@ class Auth:
 
         self._temp_code=""
         self._scope=""
+
+        self._client_secret = self._load_client_secret()
 
         # attempts to load auth config from database, return T or F
         self._authenticated=self._load_saved_auth()
@@ -53,7 +52,12 @@ class Auth:
 
     def get_auth_url(self):
         # return the auth url required for initial authorization
-        return ""
+        return "https://www.strava.com/oauth/authorize" + \
+               "?client_id=60014&" + \
+               "redirect_uri=http://127.0.0.1:5000/strava/auth&" + \
+               "response_type=code&" + \
+               "approval_prompt=auto&" + \
+               "scope=read_all%2Cactivity%3Aread_all"
     
     def init_auth(self, auth_url):
         # setup auth things the first time around
@@ -137,4 +141,10 @@ class Auth:
         )
         return r.json()
 
+    def _load_client_secret(self):
+        # NOTE: the secret must be named 'strava_app' for this to work
+        return self._db.execute(
+            'SELECT secret_value FROM client_secret WHERE secret_name = ?',
+            ("strava_app",)
+        ).fetchone()
 

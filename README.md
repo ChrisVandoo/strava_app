@@ -4,5 +4,7 @@ This is the beginning of something mediocre, perhaps one day it will turn into s
 to run the code:
 ``` 
 source startup.sh
+flask init-db
+flask load-secret
 flask run
 ```
