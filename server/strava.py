@@ -127,6 +127,7 @@ class Auth:
                 'INSERT INTO auth (id, expires_at, refresh_token, access_token) VALUES (?, ?, ?, ?)',
                 (self._user, self._expires_at, self._refresh_token, self._access_token)
             )
+        self._db.commit()
 
     def _check_token(self):
         # check that the refresh_token hasn't expired and won't expire in the next 15 minutes (900 seconds)
@@ -143,8 +144,9 @@ class Auth:
 
     def _load_client_secret(self):
         # NOTE: the secret must be named 'strava_app' for this to work
-        return self._db.execute(
-            'SELECT secret_value FROM client_secret WHERE secret_name = ?',
+        secret = self._db.execute(
+            'SELECT * FROM client_secret WHERE secret_name = ?',
             ("strava_app",)
         ).fetchone()
+        return (secret["secret_value"])
 

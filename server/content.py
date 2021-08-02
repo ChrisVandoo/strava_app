@@ -5,7 +5,7 @@ import requests
 import click
 from getpass import getpass
 
-from server.db import get_db
+from server.db import get_db, close_db
 from server.strava import Auth
 
 bp = Blueprint('content', __name__, cli_group=None)
@@ -18,18 +18,24 @@ def index():
 
 @bp.route('/strava')
 def get_strava_data():  
-    return redirect("https://www.strava.com/oauth/authorize" + \
-               "?client_id=60014&" + \
-               "redirect_uri=http://127.0.0.1:5000/strava/auth&" + \
-               "response_type=code&" + \
-               "approval_prompt=auto&" + \
-               "scope=read_all%2Cactivity%3Aread_all" )
+    user = session.get("user_id")
+    auth = Auth(user)
+    print("Authenticated? ", auth.is_auth())
+
+    if auth.is_auth():
+        token = auth.get_token()
+        print("ready to query Strava!", token)
+        # use the token to request some data from Strava
+    else:
+        url = auth.get_auth_url()
+        return redirect(url)
+
+    return redirect('/')
+    
 
 @bp.route('/strava/auth')
 def strava_token_exchange():
-    # at this point i need to parse the auth code and scope
-    # check that the scope is what i need (if not redirect)
-    # exchange auth code for access token
+    # initial OAuth authentication for Strava (should only be done once/user)
     user = session.get("user_id")
     strava_auth = Auth(user)
 
@@ -38,8 +44,6 @@ def strava_token_exchange():
         print("successfully authenticated!")
         token = strava_auth.get_token()
 
-    print(token)
-    test_db(user)
     return redirect('/')
 
 
@@ -66,3 +70,5 @@ def load_secret_command():
         (secret_name, secret_value,)
     )
 
+    db.commit()
+    db.close()
