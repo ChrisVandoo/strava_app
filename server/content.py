@@ -1,12 +1,11 @@
 from flask import (
-    Blueprint, flash, g, render_template, redirect, request, url_for, session
+    Blueprint, render_template, redirect, request, session
 )
-import requests
-import click
+
 from getpass import getpass
 
-from server.db import get_db, close_db
-from server.strava import Auth
+from server.db import get_db
+from server.strava import Auth, Strava
 
 bp = Blueprint('content', __name__, cli_group=None)
 
@@ -26,6 +25,10 @@ def get_strava_data():
         token = auth.get_token()
         print("ready to query Strava!", token)
         # use the token to request some data from Strava
+        strava = Strava(token)
+        activities = strava.list_all_activities()
+        print(activities)
+
     else:
         url = auth.get_auth_url()
         return redirect(url)

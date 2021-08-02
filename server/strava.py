@@ -1,8 +1,36 @@
 from urllib.parse import urlparse, parse_qs
-from requests import post
+from requests import post, get
 from time import time
 
 from server.db import get_db 
+
+class Strava:
+    """
+    A class wrapping the relevant bits of the Strava API.
+    """
+
+    def __init__(self, token):
+        self._auth_token = token 
+
+    def list_all_activities(self):
+        """
+        Gets a page of an athlete's activities.
+        """
+
+        r = get(
+            'https://www.strava.com/api/v3/athlete/activities',
+            data={
+                "per_page": 50
+            },
+            headers={"Authorization": "Bearer {}".format(self._auth_token)}
+        )
+
+        if not r.ok:
+            r.raise_for_status()
+        
+        return r.text
+
+
 
 class Auth:
     # wrapper for authentication with Strava
