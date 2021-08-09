@@ -6,7 +6,8 @@ DROP TABLE IF EXISTS client_secret;
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL
+  password TEXT NOT NULL,
+  strava_data BOOLEAN DEFAULT 0 
 );
 
 CREATE TABLE post (

@@ -12,24 +12,64 @@ class Strava:
     def __init__(self, token):
         self._auth_token = token 
 
-    def list_all_activities(self):
+    def get_all_activities(self):
         """
-        Gets a page of an athlete's activities.
+        Get all of an athlete's activities.
         """
 
+        raw_activities = []
+        page = 1
+
+        # arbitrarily limit this to 25 requests to avoid blowing through my API request limit
+        while page < 25:
+            print(page)
+
+            r = get(
+                'https://www.strava.com/api/v3/athlete/activities',
+                data={
+                    "page": page,
+                    "per_page": 50
+                },
+                headers={"Authorization": "Bearer {}".format(self._auth_token)}
+            )
+            
+            if r.text == "[]" or not r.ok:
+                break
+            else:
+                raw_activities.append(r.json())
+                page+=1 
+
+        return raw_activities
+
+    def get_single_activity(self, activity_id): 
+        # return a single activity for a given activity id, return None if the activity is not found
         r = get(
-            'https://www.strava.com/api/v3/athlete/activities',
-            data={
-                "per_page": 50
-            },
-            headers={"Authorization": "Bearer {}".format(self._auth_token)}
-        )
-
-        if not r.ok:
-            r.raise_for_status()
+                'https://www.strava.com/api/v3/athlete/activities',
+                data={
+                    "id": activity_id
+                },
+                headers={"Authorization": "Bearer {}".format(self._auth_token)}
+            )
         
-        return r.text
+        if r.ok and r.text != "\{\}":
+            return r.json()
+        
+        return None 
+    
+    def get_recent_activities(self):
+        # get the 10 most recent activiites for an athlete
+        r = get(
+                'https://www.strava.com/api/v3/athlete/activities',
+                data={
+                    "per_page": 10
+                },
+                headers={"Authorization": "Bearer {}".format(self._auth_token)}
+            )
 
+        if r.ok and r.text != "[]":
+            return r.json()
+        
+        return None
 
 
 class Auth:

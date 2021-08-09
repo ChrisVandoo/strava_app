@@ -17,9 +17,58 @@ Schema (save this to a Database):
 """
 
 import sqlite3
+from server.db import get_db
+
+def save_data(data, user_id):
+    """
+    Takes raw data from Strava, parses the important fields and saves it to a database.
+
+    :param: data - list of pages of data from strava
+    """
+    data_db = DataBase()
+
+    for page in data:
+        for raw_activity in page:
+            activity = parse_the_important_things(raw_activity)
+            data_db.insert_activity(activity.get("id"), user_id, activity)
+    
+    # update database setting variable indicating strava data has been loaded to true
+    db = get_db()
+    db.execute(
+        "UPDATE user SET strava_data = 1 WHERE id = ?",
+        (user_id, )
+    )
+    db.commit()
+
+
+
+
+def is_data_in_db(user_id):
+    """ 
+    Checks if the Strava data for the given user has already been retrieved
+    from Strava and is already loaded into the database.
+
+    Note: this doesn't actually check if the data exists in the database, it 
+    just checks a variable associated with the user and saved in a seperate
+    database.
+    """
+
+    db = get_db()
+    row = db.execute(
+        "SELECT * FROM user WHERE id = ?",
+        (user_id, )
+    ).fetchone()
+
+    if row["strava_data"] != 0:
+        return True
+    
+    return False 
+
 
 def parse_the_important_things(raw_activity):
     # take a bulky raw activity from Strava and return the important bits
+
+    #TODO: use .get() so things are less fragile...
     return {
         "name": raw_activity["name"],
         "distance": raw_activity["distance"],

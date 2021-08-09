@@ -6,6 +6,7 @@ from getpass import getpass
 
 from server.db import get_db
 from server.strava import Auth, Strava
+from server.data import is_data_in_db, save_data
 
 bp = Blueprint('content', __name__, cli_group=None)
 
@@ -21,17 +22,20 @@ def get_strava_data():
     auth = Auth(user)
     print("Authenticated? ", auth.is_auth())
 
-    if auth.is_auth():
-        token = auth.get_token()
-        print("ready to query Strava!", token)
-        # use the token to request some data from Strava
-        strava = Strava(token)
-        activities = strava.list_all_activities()
-        print(activities)
-
-    else:
+    if not auth.is_auth():
         url = auth.get_auth_url()
         return redirect(url)
+    
+    if not is_data_in_db(user):
+        print("Getting data from Strava...")
+        token = auth.get_token()
+        strava = Strava(token)
+        data = strava.get_all_activities()
+
+        # save the data to the database
+        save_data(data, user)
+    else:
+        print("Strava data already in the database!")
 
     return redirect('/')
     
@@ -48,17 +52,6 @@ def strava_token_exchange():
         token = strava_auth.get_token()
 
     return redirect('/')
-
-
-def test_db(user_id):
-    db = get_db()
-    stuff = db.execute(
-        'SELECT * FROM auth WHERE id = ?', (user_id,)
-    ).fetchone()
-
-    print(stuff.keys())
-    for thing in stuff:
-        print(thing)
 
 
 @bp.cli.command('load-secret')
