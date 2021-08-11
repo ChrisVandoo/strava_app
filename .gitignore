@@ -3,3 +3,4 @@ instance/
 venv/
 
 .vscode
+node_modules
