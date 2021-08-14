@@ -1,2 +1,9 @@
 {% extends 'base.html' %}
 
+{% block content %}
+    {% if g.user %}
+    <div class="position-relative position-absolute top-50 start-50 translate-middle">
+        <a class="btn btn-outline-dark" href="{{ url_for('content.get_strava_data')}}">Get Strava Data</a>
+    </div>
+    {% endif %}
+{% endblock %}

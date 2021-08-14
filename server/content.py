@@ -16,6 +16,10 @@ def index():
     # get the data from the db, render it using a template
     return render_template('index.html')
 
+@bp.route('/chart')
+def chart():
+    return render_template('chart.html')
+
 @bp.route('/strava')
 def get_strava_data():  
     user = session.get("user_id")
@@ -37,7 +41,7 @@ def get_strava_data():
     else:
         print("Strava data already in the database!")
 
-    return redirect('/')
+    return redirect('/chart')
     
 
 @bp.route('/strava/auth')

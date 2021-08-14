@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div>
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const data = {
+            datasets: [{
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: {
+                    thing: 10,
+                    thing2: 11,
+                    thing3: 3
+                },
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false 
+                    }
+                },
+            }
+        };
+
+        var myChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+    </script>
+
+{% endblock %}
