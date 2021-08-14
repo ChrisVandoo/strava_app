@@ -30,7 +30,7 @@ def save_data(data, user_id):
     for page in data:
         for raw_activity in page:
             activity = parse_the_important_things(raw_activity)
-            data_db.insert_activity(activity.get("id"), user_id, activity)
+            data_db.insert_activity(user_id, activity)
     
     # update database setting variable indicating strava data has been loaded to true
     db = get_db()
@@ -53,14 +53,14 @@ def is_data_in_db(user_id):
     database.
     """
 
-    db = get_db()
-    row = db.execute(
-        "SELECT * FROM user WHERE id = ?",
-        (user_id, )
-    ).fetchone()
+    # db = get_db()
+    # row = db.execute(
+    #     "SELECT * FROM user WHERE id = ?",
+    #     (user_id, )
+    # ).fetchone()
 
-    if row["strava_data"] != 0:
-        return True
+    # if row["strava_data"] != 0:
+    #     return True
     
     return False 
 
@@ -77,7 +77,7 @@ def parse_the_important_things(raw_activity):
         "total_elevation_gain": raw_activity["total_elevation_gain"],
         "type": raw_activity["type"],
         "id": raw_activity["id"],
-        "start_date": raw_activity["start_date"],
+        "start_date": raw_activity["start_date_local"],
         "kudos_count": raw_activity["kudos_count"],
     }
 
@@ -90,11 +90,14 @@ class DataBase():
 
         # create DB if it doesn't exist
         self._db.execute(
-            "CREATE TABLE IF NOT EXISTS client_data (activity_id INTEGER PRIMARY KEY, client_id INTEGER NOT NULL, activity_data TEXT NOT NULL)"
+            "CREATE TABLE IF NOT EXISTS client_data (activity_id INTEGER PRIMARY KEY, client_id INTEGER NOT NULL, activity_type TEXT NOT NULL, activity_date DATE NOT NULL, activity_data TEXT NOT NULL)"
         )
 
-    def insert_activity(self, activity_id, client_id, data):
+    def insert_activity(self, client_id, data):
         # adds an activity into the client database
+        activity_id = data["id"]
+        activity_type = data["type"]
+        activity_date = data["start_date"].split("T")[0]
 
         # check that the activity hasn't already been added
         row = self._db.execute(
@@ -104,8 +107,8 @@ class DataBase():
 
         if row is None:
             self._db.execute(
-                "INSERT INTO client_data VALUES (activity_id = ?, client_id = ?, activity_id = ?)",
-                (activity_id, client_id, data, activity_id)
+                "INSERT INTO client_data VALUES (activity_id = ?, client_id = ?, activity_type = ?, activity_date = ?, activity_data = ?)",
+                (activity_id, client_id, activity_type, activity_date, data)
             )
             self._db.commit()
     
