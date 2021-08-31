@@ -2,26 +2,50 @@
 
 {% block content %}
     <div>
+        <form action="/chart" method="GET">
+            <div class="container">
+                <select class="form-select form-select-sm" name="months" id="months" required >
+                    <option value=1 id="January">January</option>
+                    <option value=2 id="February">February</option>
+                    <option value=3 id="March">March</option>
+                    <option value=4 id="April">April</option>
+                    <option value=5 id="May">May</option>
+                    <option value=6 id="June">June</option>
+                    <option value=7 id="July">July</option>
+                    <option value=8 id="August">August</option>
+                    <option value=9 id="September">September</option>
+                    <option value=10 id="October">October</option>
+                    <option value=11 id="November">November</option>
+                    <option value=12 id="December">December</option>
+                </select>
+
+                <button class="btn btn-outline-dark">View</button>
+            </div>
+        </form>
+    </div>
+
+    
+    
+    <div class="container">  
+        <h1>{{month}}</h1>
         <canvas id="myChart"></canvas>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+        // setup chart related things
+        let my_data = {{ data|tojson }}
         const data = {
             datasets: [{
                 backgroundColor: 'rgb(255, 99, 132)',
                 borderColor: 'rgb(255, 99, 132)',
-                data: {
-                    thing: 10,
-                    thing2: 11,
-                    thing3: 3
-                },
+                data: my_data,
             }]
         };
 
         const config = {
-            type: 'line',
+            type: 'bar',
             data,
             options: {
                 plugins: {
@@ -36,6 +60,20 @@
             document.getElementById('myChart'),
             config
         );
+
+        // set select option to whatever was selected last
+        document.getElementById("{{month}}").toggleAttribute("selected", true)
+
+        console.log("some stuff!")
+        
+        let month_select = document.getElementById("months")
+        month_select.addEventListener(
+            onclick, 
+            function() {
+                console.log("this ran!")
+                $.get('/chart?months=' + month_select.val())
+            },
+        )
     </script>
 
 {% endblock %}

@@ -17,6 +17,9 @@ Schema (save this to a Database):
 """
 
 import sqlite3
+import json
+from datetime import datetime 
+from dateutil.parser import isoparse
 from server.db import get_db
 
 def save_data(data, user_id):
@@ -32,6 +35,8 @@ def save_data(data, user_id):
             activity = parse_the_important_things(raw_activity)
             data_db.insert_activity(user_id, activity)
     
+    data_db.shutdown()
+
     # update database setting variable indicating strava data has been loaded to true
     db = get_db()
     db.execute(
@@ -40,6 +45,7 @@ def save_data(data, user_id):
     )
     db.commit()
 
+    
 
 
 
@@ -90,14 +96,20 @@ class DataBase():
 
         # create DB if it doesn't exist
         self._db.execute(
-            "CREATE TABLE IF NOT EXISTS client_data (activity_id INTEGER PRIMARY KEY, client_id INTEGER NOT NULL, activity_type TEXT NOT NULL, activity_date DATE NOT NULL, activity_data TEXT NOT NULL)"
+            "CREATE TABLE IF NOT EXISTS client_data (activity_id INTEGER NOT NULL, client_id INTEGER NOT NULL, activity_type TEXT NOT NULL, activity_date DATETIME NOT NULL, activity_data TEXT NOT NULL);"
         )
+        if self._db.in_transaction:
+            print("committing the DB")
+            self._db.commit()
+
+    def shutdown(self):
+        self._db.close()
 
     def insert_activity(self, client_id, data):
         # adds an activity into the client database
         activity_id = data["id"]
         activity_type = data["type"]
-        activity_date = data["start_date"].split("T")[0]
+        activity_date = isoparse(data["start_date"])
 
         # check that the activity hasn't already been added
         row = self._db.execute(
@@ -105,10 +117,11 @@ class DataBase():
             (activity_id,)
         ).fetchall()
 
-        if row is None:
+        if row == []:
+            print("inserting {}".format(data))
             self._db.execute(
-                "INSERT INTO client_data VALUES (activity_id = ?, client_id = ?, activity_type = ?, activity_date = ?, activity_data = ?)",
-                (activity_id, client_id, activity_type, activity_date, data)
+                "INSERT INTO client_data (activity_id, client_id, activity_type, activity_date, activity_data) VALUES (?, ?, ?, ?, ?);",
+                (activity_id, client_id, activity_type, activity_date, json.dumps(data))
             )
             self._db.commit()
     
@@ -118,13 +131,45 @@ class DataBase():
             "select * from client_data where activity_id = ?",
             (activity_id,)
         ).fetchone()
-        return row["activity_data"]
 
-    def get_client_activities(self, client_id):
-        # returns a map of all activities for a client
+        if row is not None:
+            return row["activity_data"]
+        
+        return None
+
+
+    def get_client_activities(self, client_id, type="All", after=None, before=None):
+        """
+        Returns the activities for a given athlete, specified by client_id.
+
+        Optional Parameters:
+        date: return all activities after a given date -> the present
+        type: return all activities of a given type
+        """
+
+        query = "client_id=:id"
+        args = {"id": client_id}
+
+        if after is not None and before is not None:
+            if isinstance(after, datetime) and isinstance(before, datetime):
+                query+=" AND activity_date>=:after"
+                args["after"] = after
+
+                query+=" AND activity_date<=:before"
+                args["before"] = before
+        
+        if type != "All":
+            if type == "Ride" or type == "Run":
+                # type MUST be Ride or Run or else we ignore type
+                query+=" AND activity_type=:type"
+                args["type"] = type 
+
         activities = {}
 
-        for row in self._db.execute("select * from client_data where client_id = ?", (client_id,)):
-            activities[row["activity_id"]] = row["activity_data"]
+        print(query, args)
 
+        for row in self._db.execute("select * from client_data where ({})".format(query), args):
+            activities[isoparse(row["activity_date"])] = row["activity_data"]
+
+        print(activities)
         return activities

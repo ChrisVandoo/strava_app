@@ -1,3 +1,4 @@
+import calendar
 from flask import (
     Blueprint, render_template, redirect, request, session
 )
@@ -7,6 +8,7 @@ from getpass import getpass
 from server.db import get_db
 from server.strava import Auth, Strava
 from server.data import is_data_in_db, save_data
+from server.datahandler import DataHandler
 
 bp = Blueprint('content', __name__, cli_group=None)
 
@@ -18,7 +20,19 @@ def index():
 
 @bp.route('/chart')
 def chart():
-    return render_template('chart.html')
+    month = 1
+    if request.args:
+        month = int(request.args["months"])     
+    
+    dh = DataHandler(session.get("user_id"))
+    data = dh.get_runs_for_month(month)
+    return render_template('chart.html', data=data, month=calendar.month_name[month])
+
+@bp.route('/test')
+def test_stuff():
+    print("test stuff!")
+    return "stuff"
+
 
 @bp.route('/strava')
 def get_strava_data():  
