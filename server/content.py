@@ -41,12 +41,6 @@ def chart_data():
 
     return data
 
-@bp.route('/test')
-def test_stuff():
-    print("test stuff!")
-    return "stuff"
-
-
 @bp.route('/strava')
 def get_strava_data():  
     user = session.get("user_id")

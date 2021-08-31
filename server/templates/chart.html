@@ -48,6 +48,7 @@
                 type: 'bar',
                 data,
                 options: {
+                    scaleShowVerticalLines: false, 
                     plugins: {
                         legend: {
                             display: false 
@@ -58,6 +59,22 @@
                             ticks: {
                                 callback: function(value, index, values) {
                                     return value + " km";
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: true,
+                            },
+                            ticks: {
+                                callback: function(index) {
+                                    date = new Date(this.getLabelForValue(index))
+
+                                    if (date.getDay() == 1) {
+                                        return date.toDateString()
+                                    } else {
+                                        return ""
+                                    }
                                 }
                             }
                         }
