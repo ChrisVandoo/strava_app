@@ -20,6 +20,7 @@ def index():
 
 @bp.route('/chart')
 def chart():
+    print("chart was called!")
     month = 1
     if request.args:
         month = int(request.args["months"])     
@@ -27,6 +28,18 @@ def chart():
     dh = DataHandler(session.get("user_id"))
     data = dh.get_runs_for_month(month)
     return render_template('chart.html', data=data, month=calendar.month_name[month])
+
+@bp.route('/chart_data')
+def chart_data():
+    print("chart_data was called")
+    month = 1
+    if request.args:
+        month = int(request.args["months"])     
+    
+    dh = DataHandler(session.get("user_id"))
+    data = dh.get_runs_for_month(month)
+
+    return data
 
 @bp.route('/test')
 def test_stuff():

@@ -1,79 +1,94 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div>
-        <form action="/chart" method="GET">
-            <div class="container">
-                <select class="form-select form-select-sm" name="months" id="months" required >
-                    <option value=1 id="January">January</option>
-                    <option value=2 id="February">February</option>
-                    <option value=3 id="March">March</option>
-                    <option value=4 id="April">April</option>
-                    <option value=5 id="May">May</option>
-                    <option value=6 id="June">June</option>
-                    <option value=7 id="July">July</option>
-                    <option value=8 id="August">August</option>
-                    <option value=9 id="September">September</option>
-                    <option value=10 id="October">October</option>
-                    <option value=11 id="November">November</option>
-                    <option value=12 id="December">December</option>
-                </select>
-
-                <button class="btn btn-outline-dark">View</button>
-            </div>
-        </form>
-    </div>
+       
+        <div class="container">
+            <select class="form-select form-select-sm" name="months" id="months" required onchange="month_selected(this)">
+                <option value=1 id="January">January</option>
+                <option value=2 id="February">February</option>
+                <option value=3 id="March">March</option>
+                <option value=4 id="April">April</option>
+                <option value=5 id="May">May</option>
+                <option value=6 id="June">June</option>
+                <option value=7 id="July">July</option>
+                <option value=8 id="August">August</option>
+                <option value=9 id="September">September</option>
+                <option value=10 id="October">October</option>
+                <option value=11 id="November">November</option>
+                <option value=12 id="December">December</option>
+            </select>
+        </div>
+    
 
     
-    
-    <div class="container">  
-        <h1>{{month}}</h1>
-        <canvas id="myChart"></canvas>
+    <div class="container">
+        <div id="chartContainer" class="d-flex flex-column align-items-center p-3">  
+            <h1>{{month}}</h1>
+            <canvas id="myChart"></canvas>
+        </div>
     </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
     <script>
-        // setup chart related things
-        let my_data = {{ data|tojson }}
-        const data = {
-            datasets: [{
-                backgroundColor: 'rgb(255, 99, 132)',
-                borderColor: 'rgb(255, 99, 132)',
-                data: my_data,
-            }]
-        };
+        // create a bar chart showing distance for a given month
+        var myChart = null
+        function createChart(input_data) {
+            const data = {
+                datasets: [{
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: input_data,
+                }]
+            };
 
-        const config = {
-            type: 'bar',
-            data,
-            options: {
-                plugins: {
-                    legend: {
-                        display: false 
+            const config = {
+                type: 'bar',
+                data,
+                options: {
+                    plugins: {
+                        legend: {
+                            display: false 
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return value + " km";
+                                }
+                            }
+                        }
                     }
-                },
+                }
+            };
+            
+            if (myChart) {
+                myChart.destroy()
             }
-        };
-
-        var myChart = new Chart(
-            document.getElementById('myChart'),
-            config
-        );
-
-        // set select option to whatever was selected last
-        document.getElementById("{{month}}").toggleAttribute("selected", true)
-
-        console.log("some stuff!")
+            
+            myChart = new Chart(
+                document.getElementById('myChart'),
+                config
+            );
+        }
         
-        let month_select = document.getElementById("months")
-        month_select.addEventListener(
-            onclick, 
-            function() {
-                console.log("this ran!")
-                $.get('/chart?months=' + month_select.val())
-            },
-        )
+        createChart({{ data|tojson }})
+
+        function month_selected(option) {
+            console.log(option.value);
+
+            fetch("/chart_data?months=" + option.value)
+                .then(response => response.json())
+                .then(new_data => {
+                    createChart(new_data)
+                });
+            
+            $("#chartContainer h1").replaceWith("<h1>" + $("option").filter(":selected").attr("id") + "</h1>")
+        }
+
     </script>
 
 {% endblock %}
