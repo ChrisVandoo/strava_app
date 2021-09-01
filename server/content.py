@@ -38,10 +38,11 @@ def chart_data():
     month = 1
     if request.args:
         month = int(request.args["months"])   
-        year = int(request.args["year"])  
+        year = int(request.args["year"])
+        activity_type = request.args["type"]  
     
     dh = DataHandler(session.get("user_id"))
-    data = dh.get_runs_for_month(month, year)
+    data = dh.get_runs_for_month(month, year, activity_type)
 
     return data
 

@@ -19,6 +19,18 @@
         </select>
 
         <select class="form-select form-select-sm mt-1" name="year" id="year" required onchange="year_selected(this)"></select>
+
+        <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type" required required onchange="activity_type_selected(this)">
+            <option value="Ride">Run</option>    
+            <option value="Ride">Ride</option>
+        </select>
+
+        <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type">
+            <option value="distance">Distance</option>    
+            <option value="time">Time</option>
+            <option value="pace">Pace</option>
+        </select>
+
     </div>
     
     <div class="container">
@@ -40,9 +52,10 @@
         });
 
         //"global" variables for the current year and month (integers)
-        let curr_month_int = 1
+        let curr_month_int = $("#months option").filter(":selected").attr("value")
         let curr_month = $("#months option").filter(":selected").attr("id")
-        let curr_year = years_on_strava[0]
+        let curr_year = $("#year option").filter(":selected").attr("value")
+        let curr_type = $("#activity-type option").filter(":selected").attr("value")
 
 
         // create a bar chart showing distance for a given month
@@ -102,16 +115,24 @@
                 document.getElementById('myChart'),
                 config
             );
-        }
-        
+        }        
         createChart({{ data|tojson }})
+
+        function createUrl() {
+            // create url using curr_* values
+            return "/chart_data?" + 
+                "months=" + curr_month_int +
+                "&year=" + curr_year +
+                "&type=" + curr_type;
+        }
 
         // event handler for when a month is selected from the dropdown
         function month_selected(option) {
             // console.log(option.value);
             curr_month_int = option.value 
 
-            fetch("/chart_data?months=" + curr_month_int + "&year=" + curr_year)
+            url = createUrl()
+            fetch(url)
                 .then(response => response.json())
                 .then(new_data => {
                     createChart(new_data)
@@ -126,13 +147,27 @@
             // console.log(option.value);
             curr_year = option.value;
 
-            fetch("/chart_data?months=" + curr_month_int + "&year=" + curr_year)
+            url = createUrl()
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     createChart(data)
                 });
             
             $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
+        }
+
+        // event handler for when activity type is selected from the dropdown
+        function activity_type_selected(option) {
+            console.log(option.value)
+            curr_type = option.value;
+
+            url = createUrl()
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    createChart(data)
+                });
         }
 
     </script>

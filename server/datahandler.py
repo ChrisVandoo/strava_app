@@ -67,7 +67,7 @@ class DataHandler():
         return years
 
 
-    def get_runs_for_month(self, month, year=None):
+    def get_runs_for_month(self, month, year=None, type="All"):
         """
         month: integer specifiying which month to get data for, defaults to January (1)
         year: integer specifying the year, if it is None, defaults to the current year
@@ -83,7 +83,7 @@ class DataHandler():
                 last_day = day
                 chart_data[date(year, month, day).isoformat()] = 0
 
-        data = self._db.get_client_activities(self._user_id, "Run", datetime(year, month, 1), datetime(year, month, last_day))
+        data = self._db.get_client_activities(self._user_id, type, datetime(year, month, 1), datetime(year, month, last_day))
         if data is None:
             print("didn't find any data within the last month :(")
             return None
