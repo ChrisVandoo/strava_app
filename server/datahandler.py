@@ -23,6 +23,20 @@ def go_to_last_month():
     else:
         return now.replace(month=now.month-1)
 
+def get_pace(activity, activity_type):
+    """
+    return min/km if activity_type is Run
+    return km/hour if activity_type is Bike 
+    """
+    distance = round(activity.get("distance", 0) / 1000, 2)
+
+    if activity_type == "Run":
+        time = round(activity.get("elapsed_time", 0) / 60, 2)
+        return time / distance 
+    else:
+        time = round(activity.get("elapsed_time", 0) / 1200, 2)
+        return distance / time 
+
 class DataHandler():
     """ Return data in a way convenient to be displayed by Chart.js """
 
@@ -67,34 +81,44 @@ class DataHandler():
         return years
 
 
-    def get_runs_for_month(self, month, year=None, type="All"):
+    def get_runs_for_month(self, month, year, activity_type="All", rep_type="distance"):
         """
         month: integer specifiying which month to get data for, defaults to January (1)
         year: integer specifying the year, if it is None, defaults to the current year
         """
-        chart_data = {}
 
-        if year is None:
-            year = datetime.now().year
+        
+        chart_data = {}
 
         last_day = 0
         for day in Calendar().itermonthdays(year, month):
             if day != 0:
                 last_day = day
-                chart_data[date(year, month, day).isoformat()] = 0
+                
+                # the graph will get weird if all the days are filled in for pace
+                if rep_type != "pace":
+                    chart_data[date(year, month, day).isoformat()] = 0
 
-        data = self._db.get_client_activities(self._user_id, type, datetime(year, month, 1), datetime(year, month, last_day))
+        data = self._db.get_client_activities(self._user_id, activity_type, datetime(year, month, 1), datetime(year, month, last_day))
         if data is None:
             print("didn't find any data within the last month :(")
             return None
         
+        # iterate through activities for the month, getting the y-axis value (pace, distance, time)
         for my_date, activity_str in data.items():
             activity = json.loads(activity_str)
-            distance = round(activity.get("distance") / 1000, 2)
+            
+            if rep_type == "distance":
+                y = round(activity.get("distance") / 1000, 2)
+            elif rep_type == "time":
+                y = round(activity.get("elapsed_time") / 60, 0)
+            elif rep_type == "pace":
+                y = get_pace(activity, activity_type)
 
-            chart_data[my_date.date().isoformat()] = distance
+            chart_data[my_date.date().isoformat()] = y
 
         
         return chart_data
+
 
         

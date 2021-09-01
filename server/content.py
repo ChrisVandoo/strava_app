@@ -1,4 +1,5 @@
 import calendar
+from datetime import datetime
 from flask import (
     Blueprint, render_template, redirect, request, session
 )
@@ -21,28 +22,28 @@ def index():
 @bp.route('/chart')
 def chart():
     print("chart was called!")
-    month = 1
-    if request.args:
-        month = int(request.args["months"])     
+    
+    date = datetime.now()
     
     dh = DataHandler(session.get("user_id"))
-    data = dh.get_runs_for_month(month)
-    
+
+    data = dh.get_runs_for_month(date.month, date.year)    
     years = dh.get_years_on_strava()
 
-    return render_template('chart.html', data=data, month=calendar.month_name[month], years=years)
+    return render_template('chart.html', data=data, month=calendar.month_name[date.month], years=years)
 
 @bp.route('/chart_data')
 def chart_data():
     print("chart_data was called")
-    month = 1
     if request.args:
-        month = int(request.args["months"])   
-        year = int(request.args["year"])
-        activity_type = request.args["type"]  
+        month = int(request.args.get("months", 1))   
+        year = int(request.args.get("year", datetime.now().year))
+        activity_type = request.args.get("type", "All")
+        rep_type = request.args.get("rep_type", "distance")
+
     
     dh = DataHandler(session.get("user_id"))
-    data = dh.get_runs_for_month(month, year, activity_type)
+    data = dh.get_runs_for_month(month, year, activity_type, rep_type)
 
     return data
 

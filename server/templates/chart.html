@@ -27,14 +27,14 @@
             </div>
     
             <div class="col">
-                <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type" required required onchange="activity_type_selected(this)">
+                <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type" required onchange="activity_type_selected(this)">
                     <option value="Run">Run</option>    
                     <option value="Ride">Ride</option>
                 </select>
             </div>  
 
             <div class="col">
-                <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type">
+                <select class="form-select form-select-sm mt-1" name="data-rep" id="data-rep" required onchange="data_rep_selected(this)">
                     <option value="distance">Distance</option>    
                     <option value="time">Time</option>
                     <option value="pace">Pace</option>
@@ -59,19 +59,21 @@
     <script src={{ url_for('static', filename='chart_event_handlers.js') }}></script>
     
     <script>
-        let chart = createChart(null, {{ data|tojson }}, "bar")
+        let chart = createChart(null, {{ data|tojson }}, "bar");
 
         // setup "year" select with years on Strava
         let years_on_strava = {{ years }}  
         years_on_strava.forEach( year => {
-            $("#year").append("<option value=" + year + ">" + year + "</option>")
+            $("#year").append("<option value=" + year + ">" + year + "</option>");
         });
 
         //"global" variables for the current year and month (integers)
-        let curr_month_int = $("#months option").filter(":selected").attr("value")
-        let curr_month = $("#months option").filter(":selected").attr("id")
-        let curr_year = $("#year option").filter(":selected").attr("value")
-        let curr_type = $("#activity-type option").filter(":selected").attr("value")
+        let curr_month_int = $("#months option").filter(":selected").attr("value");
+        let curr_month = $("#months option").filter(":selected").attr("id");
+        let curr_year = $("#year option").filter(":selected").attr("value");
+        let curr_type = $("#activity-type option").filter(":selected").attr("value");
+        let curr_rep = $("#data-rep option").filter(":selected").attr("value");
+
     </script>
 
 {% endblock %}

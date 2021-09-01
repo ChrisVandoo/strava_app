@@ -3,7 +3,8 @@ function createUrl() {
     return "/chart_data?" + 
         "months=" + curr_month_int +
         "&year=" + curr_year +
-        "&type=" + curr_type;
+        "&type=" + curr_type +
+        "&rep_type=" + curr_rep;
 }
 
 // event handler for when a month is selected from the dropdown
@@ -48,4 +49,25 @@ function activity_type_selected(option) {
         .then(data => {
             chart = createChart(chart, data, "bar")
         });
+
+    $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
+}
+
+// event handler for "data-rep" (data representation) 
+function data_rep_selected(option) {
+    console.log(option.value)
+    curr_rep = option.value 
+
+    url = createUrl()
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (curr_rep == "pace") {
+                chart = createChart(chart, data, "line")
+            } else {
+                chart = createChart(chart, data, "bar")
+            }
+        });
+
+    $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
 }
