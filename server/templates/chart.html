@@ -32,7 +32,15 @@
                     <option value="Ride">Ride</option>
                 </select>
             </div>  
-                    
+
+            <div class="col">
+                <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type">
+                    <option value="distance">Distance</option>    
+                    <option value="time">Time</option>
+                    <option value="pace">Pace</option>
+                </select>
+            </div>
+
         </div>      
     </div>
     
@@ -46,18 +54,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script>
-        /*
-        <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type">
-            <option value="distance">Distance</option>    
-            <option value="time">Time</option>
-            <option value="pace">Pace</option>
-        </select>
-        */
 
-        // filled in from flask
-        let years_on_strava = {{ years }}
-        
+    <script src={{ url_for('static', filename='chart.js') }}></script>
+    <script src={{ url_for('static', filename='chart_event_handlers.js') }}></script>
+    
+    <script>
+        let chart = createChart(null, {{ data|tojson }}, "bar")
+
+        // setup "year" select with years on Strava
+        let years_on_strava = {{ years }}  
         years_on_strava.forEach( year => {
             $("#year").append("<option value=" + year + ">" + year + "</option>")
         });
@@ -67,120 +72,6 @@
         let curr_month = $("#months option").filter(":selected").attr("id")
         let curr_year = $("#year option").filter(":selected").attr("value")
         let curr_type = $("#activity-type option").filter(":selected").attr("value")
-
-
-        // create a bar chart showing distance for a given month
-        var myChart = null
-        function createChart(input_data) {
-            const data = {
-                datasets: [{
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: input_data,
-                }]
-            };
-
-            const config = {
-                type: 'bar',
-                data,
-                options: {
-                    scaleShowVerticalLines: false, 
-                    plugins: {
-                        legend: {
-                            display: false 
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                callback: function(value, index, values) {
-                                    return value + " km";
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: true,
-                            },
-                            ticks: {
-                                callback: function(index) {
-                                    date = new Date(this.getLabelForValue(index))
-
-                                    if (date.getDay() == 1) {
-                                        return date.toDateString()
-                                    } else {
-                                        return ""
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-            
-            if (myChart) {
-                myChart.destroy()
-            }
-            
-            myChart = new Chart(
-                document.getElementById('myChart'),
-                config
-            );
-        }        
-        createChart({{ data|tojson }})
-
-        function createUrl() {
-            // create url using curr_* values
-            return "/chart_data?" + 
-                "months=" + curr_month_int +
-                "&year=" + curr_year +
-                "&type=" + curr_type;
-        }
-
-        // event handler for when a month is selected from the dropdown
-        function month_selected(option) {
-            // console.log(option.value);
-            curr_month_int = option.value 
-
-            url = createUrl()
-            fetch(url)
-                .then(response => response.json())
-                .then(new_data => {
-                    createChart(new_data)
-                });
-            
-            curr_month = $("#months option").filter(":selected").attr("id")
-            $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
-        }
-
-        // event handler for when a year is selected from the dropdown
-        function year_selected(option) {
-            // console.log(option.value);
-            curr_year = option.value;
-
-            url = createUrl()
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    createChart(data)
-                });
-            
-            $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
-        }
-
-        // event handler for when activity type is selected from the dropdown
-        function activity_type_selected(option) {
-            console.log(option.value)
-            curr_type = option.value;
-
-            url = createUrl()
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    createChart(data)
-                });
-        }
-
     </script>
 
 {% endblock %}
