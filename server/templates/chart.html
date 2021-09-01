@@ -2,28 +2,28 @@
 
 {% block content %}
        
-        <div class="container">
-            <select class="form-select form-select-sm" name="months" id="months" required onchange="month_selected(this)">
-                <option value=1 id="January">January</option>
-                <option value=2 id="February">February</option>
-                <option value=3 id="March">March</option>
-                <option value=4 id="April">April</option>
-                <option value=5 id="May">May</option>
-                <option value=6 id="June">June</option>
-                <option value=7 id="July">July</option>
-                <option value=8 id="August">August</option>
-                <option value=9 id="September">September</option>
-                <option value=10 id="October">October</option>
-                <option value=11 id="November">November</option>
-                <option value=12 id="December">December</option>
-            </select>
-        </div>
-    
+    <div class="container">
+        <select class="form-select form-select-sm mt-2" name="months" id="months" required onchange="month_selected(this)">
+            <option value=1 id="January">January</option>
+            <option value=2 id="February">February</option>
+            <option value=3 id="March">March</option>
+            <option value=4 id="April">April</option>
+            <option value=5 id="May">May</option>
+            <option value=6 id="June">June</option>
+            <option value=7 id="July">July</option>
+            <option value=8 id="August">August</option>
+            <option value=9 id="September">September</option>
+            <option value=10 id="October">October</option>
+            <option value=11 id="November">November</option>
+            <option value=12 id="December">December</option>
+        </select>
 
+        <select class="form-select form-select-sm mt-1" name="year" id="year" required onchange="year_selected(this)"></select>
+    </div>
     
     <div class="container">
         <div id="chartContainer" class="d-flex flex-column align-items-center p-3">  
-            <h1>{{month}}</h1>
+            <h1>{{month}} {{ years[0] }}</h1>
             <canvas id="myChart"></canvas>
         </div>
     </div>
@@ -31,8 +31,20 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-
     <script>
+        // filled in from flask
+        let years_on_strava = {{ years }}
+        
+        years_on_strava.forEach( year => {
+            $("#year").append("<option value=" + year + ">" + year + "</option>")
+        });
+
+        //"global" variables for the current year and month (integers)
+        let curr_month_int = 1
+        let curr_month = $("#months option").filter(":selected").attr("id")
+        let curr_year = years_on_strava[0]
+
+
         // create a bar chart showing distance for a given month
         var myChart = null
         function createChart(input_data) {
@@ -94,16 +106,33 @@
         
         createChart({{ data|tojson }})
 
+        // event handler for when a month is selected from the dropdown
         function month_selected(option) {
-            console.log(option.value);
+            // console.log(option.value);
+            curr_month_int = option.value 
 
-            fetch("/chart_data?months=" + option.value)
+            fetch("/chart_data?months=" + curr_month_int + "&year=" + curr_year)
                 .then(response => response.json())
                 .then(new_data => {
                     createChart(new_data)
                 });
             
-            $("#chartContainer h1").replaceWith("<h1>" + $("option").filter(":selected").attr("id") + "</h1>")
+            curr_month = $("#months option").filter(":selected").attr("id")
+            $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
+        }
+
+        // event handler for when a year is selected from the dropdown
+        function year_selected(option) {
+            // console.log(option.value);
+            curr_year = option.value;
+
+            fetch("/chart_data?months=" + curr_month_int + "&year=" + curr_year)
+                .then(response => response.json())
+                .then(data => {
+                    createChart(data)
+                });
+            
+            $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
         }
 
     </script>

@@ -35,19 +35,37 @@ class DataHandler():
         # stuff = self._db.get_client_activities(self._user_id)
         # print(stuff)
 
-        print("Get a single activity...")
-        stuff = self._db.get_activity(5623218522)
+        # print("Get a single activity...")
+        # stuff = self._db.get_activity(5623218522)
+        # print(stuff)
+
+        # print("Retrieving rides")
+        # stuff = self._db.get_client_activities(self._user_id, "Ride")
+        # print(stuff)
+
+        # print("Retrieiving runs that were run this month")
+        # the_date = datetime(2021, 8, 1, 0, 0, 0)
+        # print(the_date)
+        # stuff = self._db.get_client_activities(self._user_id, "Run", the_date)
+        # print(stuff)
+
+        stuff = self._db.get_oldest_activity(self._user_id)
         print(stuff)
 
-        print("Retrieving rides")
-        stuff = self._db.get_client_activities(self._user_id, "Ride")
-        print(stuff)
+    def get_years_on_strava(self):
+        """
+        returns an array of integers listing the years the user has been on Strava
+        """
+        oldest_activity = isoparse(self._db.get_oldest_activity(self._user_id))
 
-        print("Retrieiving runs that were run this month")
-        the_date = datetime(2021, 8, 1, 0, 0, 0)
-        print(the_date)
-        stuff = self._db.get_client_activities(self._user_id, "Run", the_date)
-        print(stuff)
+        year = datetime.now().year
+        years = []
+        while year >= oldest_activity.year:
+            years.append(year)
+            year-=1
+
+        return years
+
 
     def get_runs_for_month(self, month, year=None):
         """
@@ -55,14 +73,12 @@ class DataHandler():
         year: integer specifying the year, if it is None, defaults to the current year
         """
         chart_data = {}
-        print(month)
 
         if year is None:
             year = datetime.now().year
 
         last_day = 0
         for day in Calendar().itermonthdays(year, month):
-            print(last_day)
             if day != 0:
                 last_day = day
                 chart_data[date(year, month, day).isoformat()] = 0

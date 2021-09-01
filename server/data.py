@@ -137,6 +137,21 @@ class DataBase():
         
         return None
 
+    def get_oldest_activity(self, client_id):
+        """
+        Find the oldest activity for a given athlete.
+        """
+
+        # this should order all activities with the oldest activity first 
+        row = self._db.execute(
+            "SELECT * FROM client_data ORDER BY activity_date"
+        ).fetchone()
+
+        if row is not None:
+            return row["activity_date"]
+
+        return None
+
 
     def get_client_activities(self, client_id, type="All", after=None, before=None):
         """
@@ -166,10 +181,10 @@ class DataBase():
 
         activities = {}
 
-        print(query, args)
+        #print(query, args)
 
         for row in self._db.execute("select * from client_data where ({})".format(query), args):
             activities[isoparse(row["activity_date"])] = row["activity_data"]
 
-        print(activities)
+        #print(activities)
         return activities

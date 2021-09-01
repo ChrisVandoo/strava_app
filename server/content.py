@@ -27,17 +27,21 @@ def chart():
     
     dh = DataHandler(session.get("user_id"))
     data = dh.get_runs_for_month(month)
-    return render_template('chart.html', data=data, month=calendar.month_name[month])
+    
+    years = dh.get_years_on_strava()
+
+    return render_template('chart.html', data=data, month=calendar.month_name[month], years=years)
 
 @bp.route('/chart_data')
 def chart_data():
     print("chart_data was called")
     month = 1
     if request.args:
-        month = int(request.args["months"])     
+        month = int(request.args["months"])   
+        year = int(request.args["year"])  
     
     dh = DataHandler(session.get("user_id"))
-    data = dh.get_runs_for_month(month)
+    data = dh.get_runs_for_month(month, year)
 
     return data
 
