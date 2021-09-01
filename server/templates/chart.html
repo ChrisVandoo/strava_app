@@ -3,34 +3,37 @@
 {% block content %}
        
     <div class="container">
-        <select class="form-select form-select-sm mt-2" name="months" id="months" required onchange="month_selected(this)">
-            <option value=1 id="January">January</option>
-            <option value=2 id="February">February</option>
-            <option value=3 id="March">March</option>
-            <option value=4 id="April">April</option>
-            <option value=5 id="May">May</option>
-            <option value=6 id="June">June</option>
-            <option value=7 id="July">July</option>
-            <option value=8 id="August">August</option>
-            <option value=9 id="September">September</option>
-            <option value=10 id="October">October</option>
-            <option value=11 id="November">November</option>
-            <option value=12 id="December">December</option>
-        </select>
+        <div class="row">
 
-        <select class="form-select form-select-sm mt-1" name="year" id="year" required onchange="year_selected(this)"></select>
-
-        <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type" required required onchange="activity_type_selected(this)">
-            <option value="Ride">Run</option>    
-            <option value="Ride">Ride</option>
-        </select>
-
-        <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type">
-            <option value="distance">Distance</option>    
-            <option value="time">Time</option>
-            <option value="pace">Pace</option>
-        </select>
-
+            <div class="col">
+                <select class="form-select form-select-sm mt-2" name="months" id="months" required onchange="month_selected(this)">
+                    <option value=1 id="January">January</option>
+                    <option value=2 id="February">February</option>
+                    <option value=3 id="March">March</option>
+                    <option value=4 id="April">April</option>
+                    <option value=5 id="May">May</option>
+                    <option value=6 id="June">June</option>
+                    <option value=7 id="July">July</option>
+                    <option value=8 id="August">August</option>
+                    <option value=9 id="September">September</option>
+                    <option value=10 id="October">October</option>
+                    <option value=11 id="November">November</option>
+                    <option value=12 id="December">December</option>
+                </select>
+            </div>
+            
+            <div class="col">
+                <select class="form-select form-select-sm mt-1" name="year" id="year" required onchange="year_selected(this)"></select>
+            </div>
+    
+            <div class="col">
+                <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type" required required onchange="activity_type_selected(this)">
+                    <option value="Run">Run</option>    
+                    <option value="Ride">Ride</option>
+                </select>
+            </div>  
+                    
+        </div>      
     </div>
     
     <div class="container">
@@ -44,6 +47,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script>
+        /*
+        <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type">
+            <option value="distance">Distance</option>    
+            <option value="time">Time</option>
+            <option value="pace">Pace</option>
+        </select>
+        */
+
         // filled in from flask
         let years_on_strava = {{ years }}
         
