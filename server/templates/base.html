@@ -8,14 +8,14 @@
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 
-  <title>{% block title %}{% endblock %} - The Strava App</title>
+  <title>{% block title %}{% endblock %} Activity Analysis for Strava</title>
 </head>
 
 
 <!--- Nav Bar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <a class="navbar-brand ms-4" href="#">
-    The Strava App
+    Activity Analysis for Strava 
   </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -29,10 +29,10 @@
         </li>
         {% if g.user %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
+          <a class="nav-link" href="{{ url_for('content.chart') }}">Charts</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('content.chart') }}">Charts!</a>
+          <a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
         </li>
         {% else %}
           <li class="nav-item">
