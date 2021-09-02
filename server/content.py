@@ -25,6 +25,7 @@ def chart():
     
     date = datetime.now()
     
+    print(session.get("user_id"))
     dh = DataHandler(session.get("user_id"))
 
     data = dh.get_runs_for_month(date.month, date.year)    

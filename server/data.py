@@ -124,6 +124,8 @@ class DataBase():
                 (activity_id, client_id, activity_type, activity_date, json.dumps(data))
             )
             self._db.commit()
+        else:
+            print("Activity already exists in the DB, not adding it! activity_id: {}".format(activity_id))
     
     def get_activity(self, activity_id):
         # returns the data for a single activity 
@@ -181,7 +183,7 @@ class DataBase():
 
         activities = {}
 
-        #print(query, args)
+        # print(query, args)
 
         for row in self._db.execute("select * from client_data where ({})".format(query), args):
             activities[isoparse(row["activity_date"])] = row["activity_data"]

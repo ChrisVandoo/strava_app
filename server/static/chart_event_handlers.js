@@ -1,3 +1,19 @@
+let chart_type = "bar"
+let y_axis_label = "km"
+
+function hasData(data) {
+    if ($.isEmptyObject(data)) {
+        $("#myChart").remove();
+        $("#temp-message").remove();
+        $("#chartContainer").append('<div id="temp-message">No data found for this month :(</div>')
+    } else {
+        $("#myChart").remove();
+        $("#temp-message").remove();
+        $("#chartContainer").append('<canvas id="myChart"></canvas>')
+        chart = createChart(chart, data, chart_type, y_axis_label, curr_type)
+    }
+}
+
 function createUrl() {
     // create url using curr_* values
     return "/chart_data?" + 
@@ -15,8 +31,8 @@ function month_selected(option) {
     url = createUrl()
     fetch(url)
         .then(response => response.json())
-        .then(new_data => {
-            chart = createChart(chart, new_data, "bar")
+        .then(data => {
+            hasData(data);
         });
     
     curr_month = $("#months option").filter(":selected").attr("id")
@@ -32,7 +48,7 @@ function year_selected(option) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            chart = createChart(chart, data, "bar")
+            hasData(data);
         });
     
     $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
@@ -47,7 +63,7 @@ function activity_type_selected(option) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            chart = createChart(chart, data, "bar")
+            hasData(data);
         });
 
     $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
@@ -63,9 +79,24 @@ function data_rep_selected(option) {
         .then(response => response.json())
         .then(data => {
             if (curr_rep == "pace") {
-                chart = createChart(chart, data, "line")
+
+                if (curr_type == "Ride") {
+                    y_axis_label = "km/h";
+                } else {
+                    y_axis_label = "/km";
+                }
+
+                chart_type = "line";
+                hasData(data);
             } else {
-                chart = createChart(chart, data, "bar")
+                if (curr_rep == "time") {
+                    y_axis_label = "min"
+                } else {
+                    y_axis_label = "km"
+                }
+
+                chart_type = "bar";
+                hasData(data);
             }
         });
 

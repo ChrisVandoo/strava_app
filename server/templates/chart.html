@@ -47,7 +47,7 @@
     <div class="container">
         <div id="chartContainer" class="d-flex flex-column align-items-center p-3">  
             <h1>{{month}} {{ years[0] }}</h1>
-            <canvas id="myChart"></canvas>
+            <canvas id="myChart"></canvas>       
         </div>
     </div>
     
@@ -59,13 +59,25 @@
     <script src={{ url_for('static', filename='chart_event_handlers.js') }}></script>
     
     <script>
-        let chart = createChart(null, {{ data|tojson }}, "bar");
-
+        let data = {{ data|tojson }}
+        
+        let chart = null;
+        if ($.isEmptyObject(data)) {
+            $("#myChart").remove();
+            $("#temp-message").remove();
+            $("#chartContainer").append('<div id="temp-message">No data found for this month :(</div>');
+        } else {
+            chart = createChart(null, data, "bar", "km");
+        }
+        
         // setup "year" select with years on Strava
         let years_on_strava = {{ years }}  
         years_on_strava.forEach( year => {
             $("#year").append("<option value=" + year + ">" + year + "</option>");
         });
+
+        // select current month
+        document.getElementById("months").selectedIndex = $("#{{ month }}").prop("index")
 
         //"global" variables for the current year and month (integers)
         let curr_month_int = $("#months option").filter(":selected").attr("value");

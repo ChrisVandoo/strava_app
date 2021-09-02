@@ -11,9 +11,10 @@ DataHandler - class to manipulate and parse Strava data.
 
 from dateutil.parser import isoparse
 from calendar import Calendar
-from datetime import date, datetime
+from datetime import date, datetime, time 
 from server.data import DataBase
 import json
+from math import floor
 
 def go_to_last_month():
     now = datetime.now()
@@ -25,17 +26,19 @@ def go_to_last_month():
 
 def get_pace(activity, activity_type):
     """
-    return min/km if activity_type is Run
+    return seconds/km if activity_type is Run
     return km/hour if activity_type is Bike 
     """
     distance = round(activity.get("distance", 0) / 1000, 2)
 
     if activity_type == "Run":
-        time = round(activity.get("elapsed_time", 0) / 60, 2)
-        return time / distance 
+        # pace in seconds/km
+        pace_in_seconds = round(activity.get("moving_time", 1) / distance, 3)
+        return pace_in_seconds
     else:
-        time = round(activity.get("elapsed_time", 0) / 1200, 2)
-        return distance / time 
+        total_time = round(activity.get("moving_time", 0) / 3600, 2)
+        pace = round(distance / total_time, 2)
+        return pace
 
 class DataHandler():
     """ Return data in a way convenient to be displayed by Chart.js """
@@ -45,9 +48,9 @@ class DataHandler():
         self._user_id = user_id
 
     def get_some_activities(self):
-        # print ("Activity dump ")
-        # stuff = self._db.get_client_activities(self._user_id)
-        # print(stuff)
+        print ("Activity dump ")
+        stuff = self._db.get_client_activities(self._user_id)
+        print(stuff)
 
         # print("Get a single activity...")
         # stuff = self._db.get_activity(5623218522)
@@ -63,8 +66,8 @@ class DataHandler():
         # stuff = self._db.get_client_activities(self._user_id, "Run", the_date)
         # print(stuff)
 
-        stuff = self._db.get_oldest_activity(self._user_id)
-        print(stuff)
+        # stuff = self._db.get_oldest_activity(self._user_id)
+        # print(stuff)
 
     def get_years_on_strava(self):
         """
@@ -94,15 +97,15 @@ class DataHandler():
         for day in Calendar().itermonthdays(year, month):
             if day != 0:
                 last_day = day
-                
+
                 # the graph will get weird if all the days are filled in for pace
                 if rep_type != "pace":
                     chart_data[date(year, month, day).isoformat()] = 0
 
         data = self._db.get_client_activities(self._user_id, activity_type, datetime(year, month, 1), datetime(year, month, last_day))
-        if data is None:
+        if data == {}:
             print("didn't find any data within the last month :(")
-            return None
+            return {}
         
         # iterate through activities for the month, getting the y-axis value (pace, distance, time)
         for my_date, activity_str in data.items():
