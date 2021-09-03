@@ -23,18 +23,18 @@
             </div>
             
             <div class="col">
-                <select class="form-select form-select-sm mt-1" name="year" id="year" required onchange="year_selected(this)"></select>
+                <select class="form-select form-select-sm mt-2" name="year" id="year" required onchange="year_selected(this)"></select>
             </div>
     
             <div class="col">
-                <select class="form-select form-select-sm mt-1" name="activity-type" id="activity-type" required onchange="activity_type_selected(this)">
+                <select class="form-select form-select-sm mt-2" name="activity-type" id="activity-type" required onchange="activity_type_selected(this)">
                     <option value="Run">Run</option>    
                     <option value="Ride">Ride</option>
                 </select>
             </div>  
 
             <div class="col">
-                <select class="form-select form-select-sm mt-1" name="data-rep" id="data-rep" required onchange="data_rep_selected(this)">
+                <select class="form-select form-select-sm mt-2" name="data-rep" id="data-rep" required onchange="data_rep_selected(this)">
                     <option value="distance">Distance</option>    
                     <option value="time">Time</option>
                     <option value="pace">Pace</option>
@@ -52,7 +52,7 @@
     </div>
 
     <div class="container">
-            <div id="monthlyTotals" class="d-flex justify-content-evenly">
+            <div id="monthlyTotals" class="d-flex justify-content-evenly rounded">
                 <div id="totalDistance" class="m-1"></div>
                 <div id="totalTime" class="m-1"></div>
                 <div id="avgPace" class="m-1"></div>

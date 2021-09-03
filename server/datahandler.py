@@ -55,9 +55,9 @@ def format_run_pace(pace_in_seconds):
     seconds = round((pace_in_min % minutes) * 60)
 
     if seconds / 10 >= 1:
-        return "Average Pace: {}:{} /km".format(minutes, seconds)
+        return "<strong>Average Pace:</strong> {}:{} /km".format(minutes, seconds)
     else:
-        return "Average Pace: {}:0{} /km".format(minutes, seconds)
+        return "<strong>Average Pace:</strong> {}:0{} /km".format(minutes, seconds)
 
 def format_time(total_time):
     # takes a time in minutes and converts it to HH:MM
@@ -149,7 +149,7 @@ class DataHandler():
         if activity_type == "Run":
             monthly_totals["avg_pace"] = format_run_pace(round(sum(pace) / len(pace), 2))
         else:
-            monthly_totals["avg_pace"] = "Average Speed: {} km/h".format(round(sum(pace) / len(pace), 2)) 
+            monthly_totals["avg_pace"] = "<strong>Average Speed:</strong> {} km/h".format(round(sum(pace) / len(pace), 2)) 
 
         return monthly_totals
 

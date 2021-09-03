@@ -28,8 +28,8 @@ function setMonthTotals(data) {
 
         // add new totals
         $("#monthlyTotals").addClass("border")
-        $("#totalDistance").append("Total Distance: " + data.total_distance + " km")
-        $("#totalTime").append("Total Time: " + data.total_time)
+        $("#totalDistance").append("<strong>Total Distance:</strong> " + data.total_distance + " km")
+        $("#totalTime").append("<strong>Total Time: </strong>" + data.total_time)
         $("#avgPace").append(data.avg_pace)
     }
 }
