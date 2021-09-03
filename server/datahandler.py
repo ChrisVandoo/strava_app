@@ -16,6 +16,14 @@ from server.data import DataBase
 import json
 from math import floor
 
+def get_last_day_of_month(year, month):
+    # given a year and month, returns the last day of the month
+    last_day = 0
+    for day in Calendar().itermonthdays(year, month):
+        if day != 0:
+            last_day = day
+    return last_day
+
 def go_to_last_month():
     now = datetime.now()
 
@@ -39,6 +47,29 @@ def get_pace(activity, activity_type):
         total_time = round(activity.get("moving_time", 0) / 3600, 2)
         pace = round(distance / total_time, 2)
         return pace
+
+def format_run_pace(pace_in_seconds):
+    # nicely format pace for runs min:sec
+    pace_in_min = pace_in_seconds / 60
+    minutes = floor(pace_in_min)
+    seconds = round((pace_in_min % minutes) * 60)
+
+    if seconds / 10 >= 1:
+        return "Average Pace: {}:{} /km".format(minutes, seconds)
+    else:
+        return "Average Pace: {}:0{} /km".format(minutes, seconds)
+
+def format_time(total_time):
+    # takes a time in minutes and converts it to HH:MM
+    if total_time < 60:
+        return "{}m".format(total_time)
+
+    in_hours = total_time / 60
+    hours = floor(total_time / 60)
+    minutes = round((in_hours % hours) * 60)
+ 
+    return "{}h {}m".format(hours, minutes)
+
 
 class DataHandler():
     """ Return data in a way convenient to be displayed by Chart.js """
@@ -83,6 +114,44 @@ class DataHandler():
 
         return years
 
+    def get_totals_for_month(self, month, year, activity_type="All"):
+        """
+        Return the total distance moved, time spent moving, and the average 
+        pace for the month.
+        """
+
+        data = self._db.get_client_activities(self._user_id, activity_type, datetime(year, month, 1), datetime(year, month, get_last_day_of_month(year, month)))
+        if data == {}:
+            print("didn't find any data within the last month :(")
+            return {}
+
+        monthly_totals = {
+            "total_distance": 0,
+            "total_time": 0,
+            "avg_pace": 0
+        }
+
+        pace = []
+
+        for _, activity_str in data.items():
+            activity = json.loads(activity_str)
+
+            # distance in km
+            monthly_totals["total_distance"] += round(activity.get("distance") / 1000, 2)
+            # time in minutes
+            monthly_totals["total_time"] += round(activity.get("elapsed_time") / 60)
+            
+            pace.append(get_pace(activity, activity_type))
+
+        monthly_totals["total_distance"] = round(monthly_totals["total_distance"], 1)            
+        monthly_totals["total_time"] = format_time(monthly_totals["total_time"])
+
+        if activity_type == "Run":
+            monthly_totals["avg_pace"] = format_run_pace(round(sum(pace) / len(pace), 2))
+        else:
+            monthly_totals["avg_pace"] = "Average Speed: {} km/h".format(round(sum(pace) / len(pace), 2)) 
+
+        return monthly_totals
 
     def get_runs_for_month(self, month, year, activity_type="All", rep_type="distance"):
         """

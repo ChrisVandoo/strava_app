@@ -14,6 +14,26 @@ function hasData(data) {
     }
 }
 
+function setMonthTotals(data) {
+    if ($.isEmptyObject(data)) {
+        $("#monthlyTotals").removeClass("border")
+        $("#totalDistance").empty()
+        $("#totalTime").empty()
+        $("#avgPace").empty()
+    } else {
+        // clean out previous totals
+        $("#totalDistance").empty()
+        $("#totalTime").empty()
+        $("#avgPace").empty()
+
+        // add new totals
+        $("#monthlyTotals").addClass("border")
+        $("#totalDistance").append("Total Distance: " + data.total_distance + " km")
+        $("#totalTime").append("Total Time: " + data.total_time)
+        $("#avgPace").append(data.avg_pace)
+    }
+}
+
 function createUrl() {
     // create url using curr_* values
     return "/chart_data?" + 
@@ -32,7 +52,8 @@ function month_selected(option) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            hasData(data);
+            hasData(data.data);
+            setMonthTotals(data.totals);
         });
     
     curr_month = $("#months option").filter(":selected").attr("id")
@@ -48,7 +69,8 @@ function year_selected(option) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            hasData(data);
+            hasData(data.data);
+            setMonthTotals(data.totals);
         });
     
     $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
@@ -63,7 +85,8 @@ function activity_type_selected(option) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            hasData(data);
+            hasData(data.data);
+            setMonthTotals(data.totals);
         });
 
     $("#chartContainer h1").replaceWith("<h1>" + curr_month + " " + curr_year + "</h1>");
@@ -87,7 +110,8 @@ function data_rep_selected(option) {
                 }
 
                 chart_type = "line";
-                hasData(data);
+                hasData(data.data);
+                setMonthTotals(data.totals);
             } else {
                 if (curr_rep == "time") {
                     y_axis_label = "min"
@@ -96,7 +120,8 @@ function data_rep_selected(option) {
                 }
 
                 chart_type = "bar";
-                hasData(data);
+                hasData(data.data);
+                setMonthTotals(data.totals);
             }
         });
 

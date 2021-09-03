@@ -24,8 +24,6 @@ def chart():
     print("chart was called!")
     
     date = datetime.now()
-    
-    print(session.get("user_id"))
     dh = DataHandler(session.get("user_id"))
 
     data = dh.get_runs_for_month(date.month, date.year)    
@@ -45,8 +43,9 @@ def chart_data():
     
     dh = DataHandler(session.get("user_id"))
     data = dh.get_runs_for_month(month, year, activity_type, rep_type)
+    totals = dh.get_totals_for_month(month, year, activity_type)
 
-    return data
+    return {"data": data, "totals": totals}
 
 @bp.route('/strava')
 def get_strava_data():  
