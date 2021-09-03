@@ -50,22 +50,6 @@ function createChart(chart, input_data, chart_type, y_axis_label, activity_type)
                     ticks: {
                         callback: y_callback
                     }
-                },
-                x: {
-                    grid: {
-                        display: true,
-                    },
-                    ticks: {
-                        callback: function(index) {
-                            date = new Date(this.getLabelForValue(index))
-
-                            if (date.getDay() == 1) {
-                                return date.toDateString()
-                            } else {
-                                return ""
-                            }
-                        }
-                    }
                 }
             }
         }

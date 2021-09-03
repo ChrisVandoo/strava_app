@@ -71,7 +71,7 @@ function activity_type_selected(option) {
 
 // event handler for "data-rep" (data representation) 
 function data_rep_selected(option) {
-    console.log(option.value)
+    // console.log(option.value)
     curr_rep = option.value 
 
     url = createUrl()
