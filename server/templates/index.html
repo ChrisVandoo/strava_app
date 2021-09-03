@@ -1,10 +1,32 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% if g.user %}
-    <div class="position-relative position-absolute top-50 start-50 translate-middle">
-        <a class="btn btn-outline-dark" href="{{ url_for('content.get_strava_data')}}">Get Strava Data</a>
-    </div>
+    <div class="container ">
+        <div class="d-flex justify-content-evenly">
+            <h1 class="display-6 m-3">Welcome to Activity Analysis for Strava!</h1>
+        </div>
 
+        {% if not g.user %}
+        <div class='d-flex flex-column align-items-center p-3'>
+            <p>
+                To view awesome charts of your Strava data, register for an account and log in!
+            </p>
+        </div>
+        {% endif %}
+
+
+    {% if g.user %}
+    <div class='d-flex flex-column align-items-center p-3'>
+        <p>
+            To get started, click on the <strong>Get Strava Data</strong> button. This authenticates you with Strava,
+            downloads your activity data, and lets you view awesome charts to get deeper insight into your fitness.
+        </p>
+
+
+        <div class="pt-5">
+            <a class="btn btn-outline-dark" href="{{ url_for('content.get_strava_data')}}">Get Strava Data</a>
+        </div>
+    </div>
     {% endif %}
+    </div>
 {% endblock %}
