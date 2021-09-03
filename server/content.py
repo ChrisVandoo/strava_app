@@ -16,8 +16,12 @@ bp = Blueprint('content', __name__, cli_group=None)
 
 @bp.route('/')
 def index():
+    user = session.get("user_id")
+    auth = Auth(user)
+    print("Authenticated? ", auth.is_auth())
+
     # get the data from the db, render it using a template
-    return render_template('index.html')
+    return render_template('index.html', auth=auth.is_auth())
 
 @bp.route('/chart')
 def chart():
@@ -51,11 +55,9 @@ def chart_data():
 def get_strava_data():  
     user = session.get("user_id")
     auth = Auth(user)
-    print("Authenticated? ", auth.is_auth())
 
-    if not auth.is_auth():
-        url = auth.get_auth_url()
-        return redirect(url)
+    # since authentication with Strava is handled first, assumes we are authenticated
+    print("Authenticated? ", auth.is_auth())
     
     if not is_data_in_db(user):
         print("Getting data from Strava...")
@@ -69,6 +71,16 @@ def get_strava_data():
         print("Strava data already in the database!")
 
     return redirect('/chart')
+
+@bp.route('/strava_auth')
+def authenticate_with_strava():
+    user = session.get("user_id")
+    auth = Auth(user)
+    print("Authenticated? ", auth.is_auth())
+
+    if not auth.is_auth():
+        url = auth.get_auth_url()
+        return redirect(url)
     
 
 @bp.route('/strava/auth')

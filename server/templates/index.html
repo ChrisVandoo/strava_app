@@ -18,13 +18,20 @@
     {% if g.user %}
     <div class='d-flex flex-column align-items-center p-3'>
         <p>
-            To get started, click on the <strong>Get Strava Data</strong> button. This authenticates you with Strava,
-            downloads your activity data, and lets you view awesome charts to get deeper insight into your fitness.
+            If this is your first time here, click on the <strong>Authenticate with Strava</strong> button to allow
+            this web application to download your activity data.
+            <br><br>
+            Once you are authenticated with Strava, click the <strong>Get Strava Data</strong> button to download
+            your activity data and see awesome charts visualizing your fitness!
         </p>
 
 
         <div class="pt-5">
-            <a class="btn btn-outline-dark" href="{{ url_for('content.get_strava_data')}}">Get Strava Data</a>
+            {% if auth %}
+                <a class="btn btn-outline-dark" href="{{ url_for('content.get_strava_data')}}">Get Strava Data</a>
+            {% else %}
+                <a class="btn btn-outline-dark" href="{{ url_for('content.authenticate_with_strava')}}">Authenticate with Strava</a>
+            {% endif %}
         </div>
     </div>
     {% endif %}
