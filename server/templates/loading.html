@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="mt-5 d-flex flex-column align-items-center">
+    <p class="me-4">
+        Downloading your data from Strava, this shouldn't take long...
+    </p>
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <script>
+      // downloads data from Strava asynchronously, redirects to view chart once
+      // data has been downloaded
+    
+      $.ajax(
+          {
+              url: "{{ url_for('content.get_strava_data') }}",
+              success: function(result) {
+                  window.location.replace("{{ url_for('content.chart')}}")
+              }
+          }
+        );
+
+  </script>
+
+{% endblock %}

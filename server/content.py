@@ -70,7 +70,12 @@ def get_strava_data():
     else:
         print("Strava data already in the database!")
 
-    return redirect('/chart')
+    # this should be setup to be conditional on if the data is actually loaded...
+    return {"result": True}
+
+@bp.route('/loading')
+def loading_page():
+    return render_template("loading.html") 
 
 @bp.route('/strava_auth')
 def authenticate_with_strava():
