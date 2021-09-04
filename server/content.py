@@ -21,7 +21,7 @@ def index():
     print("Authenticated? ", auth.is_auth())
 
     # get the data from the db, render it using a template
-    return render_template('index.html', auth=auth.is_auth())
+    return render_template('index.html', auth=auth.is_auth(), is_downloaded=is_data_in_db(user))
 
 @bp.route('/chart')
 def chart():
