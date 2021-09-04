@@ -30,10 +30,11 @@ def chart():
     date = datetime.now()
     dh = DataHandler(session.get("user_id"))
 
-    data = dh.get_runs_for_month(date.month, date.year)    
+    data = dh.get_runs_for_month(date.month, date.year)
+    totals = dh.get_totals_for_month(date.month, date.year, "Run")    
     years = dh.get_years_on_strava()
 
-    return render_template('chart.html', data=data, month=calendar.month_name[date.month], years=years)
+    return render_template('chart.html', data=data, totals=totals, month=calendar.month_name[date.month], years=years)
 
 @bp.route('/chart_data')
 def chart_data():

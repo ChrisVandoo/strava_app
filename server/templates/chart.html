@@ -67,7 +67,15 @@
     <script src={{ url_for('static', filename='chart_event_handlers.js') }}></script>
     
     <script>
+        // initial setup
+
         let data = {{ data|tojson }}
+        let totals = {{ totals|tojson }}
+
+        $("#monthlyTotals").addClass("border")
+        $("#totalDistance").append("<strong>Total Distance:</strong> " + totals.total_distance + " km")
+        $("#totalTime").append("<strong>Total Time: </strong>" + totals.total_time)
+        $("#avgPace").append(totals.avg_pace)
         
         let chart = null;
         if ($.isEmptyObject(data)) {
