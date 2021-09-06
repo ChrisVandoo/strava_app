@@ -4,3 +4,7 @@ venv/
 
 .vscode
 node_modules
+
+temp
+strava_app.egg-info
+*.pytest_cache
