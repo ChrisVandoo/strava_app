@@ -8,6 +8,10 @@ The chart can be configured to display:
 - total distance
 - average pace
 
+# What it looks like:
+![Screen Shot 2021-09-07 at 5 23 23 PM](https://user-images.githubusercontent.com/55151443/132412847-cde17db4-a963-46fa-9661-2b4383ed906a.png)
+
+
 # Development
 to run the code:
 ``` 
