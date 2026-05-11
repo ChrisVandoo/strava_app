@@ -20,5 +20,3 @@ flask init-db
 flask load-secret
 flask run
 ```
-
-## note: this is a work in progress! Please report any bugs :)
